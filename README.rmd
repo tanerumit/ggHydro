@@ -17,7 +17,7 @@ install directly from github using the devtools package. First install devtools,
 instructions can be found here: https://github.com/hadley/devtools
 
 ```{r, eval = FALSE}
-devtools::install_github('tanerumit/hydrosystems')
+devtools::install_github('tanerumit/ggHydro')
 ```
 
 
