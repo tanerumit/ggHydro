@@ -1,7 +1,7 @@
 
-theme_climSurface <- function(font_size = 10, ...) {
+theme_climSurface <- function(...) {
 
-  theme_set(theme_light(base_size = font_size))
+  theme_set(theme_light(...))
 
   theme_climateSurface <- theme(
         text             = element_text(color = "#444444"),
@@ -11,7 +11,6 @@ theme_climSurface <- function(font_size = 10, ...) {
         plot.subtitle    = element_text(size = font_size),
         axis.title       = element_text(size = font_size),
         axis.text        = element_text(size = font_size),
-        legend.title     = element_blank(),
         legend.text      = element_text(size = font_size),
         panel.grid.major = element_line(color = "gray95"),
         panel.grid.minor = element_blank(),

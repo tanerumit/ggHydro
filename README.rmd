@@ -20,7 +20,6 @@ instructions can be found here: https://github.com/hadley/devtools
 devtools::install_github('tanerumit/ggHydro')
 ```
 
-
 ## Getting started
 
 ```{r, eval = FALSE}
