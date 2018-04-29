@@ -5,7 +5,7 @@
 ggHydro
 -------
 
-Ggplot convenient function for water resources systems analysis
+ggplot wrappers for water resources systems analysis
 
 Installation
 ------------
