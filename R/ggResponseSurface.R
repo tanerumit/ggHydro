@@ -37,7 +37,8 @@ ggResponseSurface <- function(
   bin.fail.range = NULL,
   bin.threshold = NULL,
   metric.dir = "increasing",
-  display.center.value = TRUE)
+  display.center.value = TRUE,
+  verbose = FALSE)
 
 {
 
@@ -81,12 +82,13 @@ ggResponseSurface <- function(
       mutate(bins = cut(metric, breaks = bins, dig.lab = 5, include.lowest = T))
 
   #Display range or center value of the range
-  if (display.center.value == TRUE) bins <- (bins[-length(bins)] + bins[-1])/2
+  bin_labs <- bins
+  if (display.center.value == TRUE) bin_labs <- (bins[-length(bins)] + bins[-1])/2
 
   #Base-plot
   gg <- ggplot(df, aes(x = tavg, y = prcp)) +
     geom_tile(aes(fill = bins), color = "gray70") +
-    scale_fill_manual(values=var_col, drop = FALSE, labels = bins) +
+    scale_fill_manual(values=var_col, drop = FALSE, labels = bin_labs) +
     scale_x_continuous(expand = c(0,0), breaks = tavg_breaks) +
     scale_y_continuous(expand = c(0,0), breaks = prcp_breaks) +
     labs(x = expression("Temperature change (" * degree * C *")"),
@@ -94,7 +96,13 @@ ggResponseSurface <- function(
     guides(fill  = guide_legend(order = 1),
            color = guide_legend(order = 2))
 
-  return(gg)
+  if(verbose == TRUE) {
+    out <- list(plot = gg, bins = bins, color = var_col)
+  } else {
+    out <- gg
+  }
+
+  return(out)
 
 }
 

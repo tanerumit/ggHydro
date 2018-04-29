@@ -1,7 +1,7 @@
 
-theme_climSurface <- function(...) {
+theme_climSurface <- function(font_size = 10, ...) {
 
-  theme_set(theme_light(...))
+  theme_set(theme_light(base_size = font_size, ...))
 
   theme_climateSurface <- theme(
         text             = element_text(color = "#444444"),
