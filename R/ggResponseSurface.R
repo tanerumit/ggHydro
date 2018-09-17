@@ -1,110 +1,107 @@
 
 
-#' @title Climate response surface in ggplot
-#' @description FUNCTION_DESCRIPTION
-#' @param data data frame containing climate response surfaca data
-#' @param tavg.col name of the temperature changes column, Default: 'tavg'
-#' @param prcp.col name of the precipitation changes column, Default: 'prcp'
-#' @param metric.col name of the metric column, Default: NULL
-#' @param tavg.breaks temperature change axis breaks, Default: NULL
-#' @param prcp.breaks precipitation change axis breaks, Default: NULL
-#' @param bin.pass.range placeholder
-#' @param bin.fail.range placeholder
-#' @param bin.threshold placeholder
-#' @param metric.dir placeholder
-#' @param display.center.value placeholder
+#' Climate Response Surface
 #'
-#' @return returns a ggplot2 object
-#' @details DETAILS
-#' @examples
-#' \dontrun{
-#' if(interactive()){
-#'  #EXAMPLE1
-#'  }
-#' }
-#' @rdname ggResponseSurface
+#' @param data data frame object with x, y, and z columns
+#' @param x.specs list of parameters specified for x dimension
+#' @param y.specs list of parameters specified for y dimension
+#' @param z.specs list of parameters specified for z dimension
+#' @param display.center.value
+#' @param plot.title
+#' @param verbose
+#'
+#' @return
 #' @export
-
+#'
+#' @examples
 
 ggResponseSurface <- function(
   data = NULL,
-  tavg.col = "tavg",
-  prcp.col = "prcp",
-  metric.col = NULL,
-  tavg.breaks = NULL,
-  prcp.breaks = NULL,
-  bin.pass.range = NULL,
-  bin.fail.range = NULL,
-  bin.threshold = NULL,
-  metric.dir = "increasing",
-  display.center.value = TRUE,
+  x.specs = list(name = NULL, label = NULL),
+  y.specs = list(name = NULL, label = NULL),
+  z.specs = list(name = NULL, bins.up = NULL, bins.low = NULL, bins.mid = NULL, dir = "+"),
+  display.center.value = TRUE,  plot.title = NULL,
   verbose = FALSE)
-
 {
 
+  #Libraries required
   require(ggplot2)
   require(dplyr)
   require(ggsci)
 
-  #Climate response surface dimensions
-  tavg <- data[[tavg.col]]
-  prcp <- data[[prcp.col]]
-  metric <- data[[metric.col]]
+  # x, y, and z axis variables
+  x_data <- data[[x.specs$name]]
+  y_data <- data[[y.specs$name]]
+  z_data <- data[[z.specs$name]]
 
-  # tavg axis scaling
-  tavg_breaks   <- unique(tavg)
-  tavg_step <- (tavg[2] - tavg[1])/2
-  tavg_lim  <- range(tavg) + c(- tavg_step, tavg_step)
+  # Specify x, y breaks
+  x_breaks <- unique(x_data)
+  y_breaks <- unique(y_data)
 
-  # precip axis scaling
-  prcp_breaks   <- unique(prcp)
-  prcp_step <- (prcp[2] - prcp[1])/2
-  prcp_lim  <- range(prcp) + c(- prcp_step, prcp_step)
+  # Specify x,y intervals
+  x_interval <- (x_breaks[2] - x_breaks[1])/2
+  y_interval <- (y_breaks[2] - y_breaks[1])/2
 
-  # performance metric scaling
-  bin_pass_num <- length(bin.pass.range)-1
-  bin_fail_num <- length(bin.fail.range)-1
-  if(metric.dir == "increasing") {
-    col_low <- if(!is.null(bin.fail.range)) rev(pal_material("red")(bin_fail_num)) else NULL
-    col_up  <- if(!is.null(bin.pass.range)) pal_material("blue")(bin_pass_num) else NULL
-    col_mid <- if(!is.null(bin.threshold)) "white" else NULL
+  # Specify x,y limits
+  x_lim <- range(x_data) + x_interval * c(-1,1)
+  y_lim <- range(y_data) + y_interval * c(-1,1)
+
+  # Number of bins in the lower and upper ranges
+  z_bin_up_num  <- length(z.specs$bins.up)  - 1
+  z_bin_low_num <- length(z.specs$bins.low) - 1
+
+  # If the improvement direction is positive
+  if (z.specs$dir == "+") {
+    color_low <- "red"; color_up <- "blue"
+  # If the improvement direction is negative
   } else {
-    col_low  <- if(!is.null(bin.pass.range)) rev(pal_material("blue")(bin_pass_num)) else NULL
-    col_up   <- if(!is.null(bin.fail.range)) pal_material("red")(bin_fail_num) else NULL
+    color_low <- "blue"; color_up <- "red"
   }
 
-  col_mid <- if(!is.null(bin.threshold)) "white" else NULL
-  var_col <- c(col_low, col_mid, col_up)
-  bins <- c(bin.fail.range, bin.threshold, bin.pass.range) %>% unique()
+  z_bin_color_low <- if (!is.null(z.specs$bins.low)) rev(pal_material(color_low)(z_bin_low_num)) else NULL
+  z_bin_color_up  <- if (!is.null(z.specs$bins.up)) pal_material(color_up)(z_bin_up_num) else NULL
+  z_bin_color_mid <- if (!is.null(z.specs$bins.mid)) "white" else NULL
+  z_bin_color     <- c(z_bin_color_low, z_bin_color_mid, z_bin_color_up)
 
-  # Prepare final data frame for plotting
-  df <- data %>% ungroup() %>%
-      mutate(bins = cut(metric, breaks = bins, dig.lab = 5, include.lowest = T))
+  # Define bins
+  z_bins <- c(z.specs$bins.low, z.specs$bins.mid, z.specs$bins.up) %>% unique()
 
-  #Display range or center value of the range
-  bin_labs <- bins
-  if (display.center.value == TRUE) bin_labs <- (bins[-length(bins)] + bins[-1])/2
+  # Final data frame for plotting
+  df <- data_frame(x = x_data, y = y_data, z = z_data) %>%
+    mutate(z = cut(z, breaks = z_bins, dig.lab = 5, include.lowest = T))
 
-  #Base-plot
-  gg <- ggplot(df, aes(x = tavg, y = prcp)) +
-    geom_tile(aes(fill = bins), color = "gray70") +
-    scale_fill_manual(values=var_col, drop = FALSE, labels = bin_labs) +
-    scale_x_continuous(expand = c(0,0), breaks = tavg_breaks) +
-    scale_y_continuous(expand = c(0,0), breaks = prcp_breaks) +
-    labs(x = expression("Temperature change (" * degree * C *")"),
-         y = "Precipation change (%)", color = NULL, fill = NULL) +
-    guides(fill  = guide_legend(order = 1),
-           color = guide_legend(order = 2))
 
-  if(verbose == TRUE) {
-    out <- list(plot = gg, bins = bins, color = var_col)
+  if (display.center.value == TRUE) {
+    z_bin_labels <- (z_bins[-length(z_bins)] + z_bins[-1])/2
   } else {
-    out <- gg
+    z_bin_labels <- unique(df$z_bins)
+  }
+
+  p <- ggplot(df, aes(x = x, y = y)) +
+    # Z-axis tiling
+    geom_tile(aes(fill = z), color = "gray70") +
+    # set z-axis parameters
+    scale_fill_manual(values = z_bin_color, drop = F, labels = z_bin_labels) +
+    # set x-axis parameters
+    scale_x_continuous(expand = c(0, 0), breaks = x_breaks) +
+    # set y-axis parameters
+    scale_y_continuous(expand = c(0, 0), breaks = y_breaks) +
+    # labels
+    labs(x = x.specs$label, y = y.specs$label, color = NULL, fill = z.specs$label) +
+    # Legand
+    guides(fill = guide_legend(order = 1), color = guide_legend(order = 2))
+
+  if (!is.null(plot.title)) {
+    p <- p + ggtitle(plot.title)
+  }
+
+  if (verbose == TRUE) {
+    out <- list(plot = p, z_bins = z_bins, z_color = z_color)
+
+  } else {
+
+    out <- p
   }
 
   return(out)
-
 }
-
-
-
