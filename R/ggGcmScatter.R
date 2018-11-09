@@ -2,7 +2,8 @@
 
 gcmScatterPlot <- function(data = NULL, hist.period = NULL, proj.period = NULL,
   scenarios = c("rcp26", "rcp85"),tavg.breaks = NULL, prcp.breaks = NULL,
-  save = FALSE, plot_historical = TRUE, plot.title = TRUE, chull = FALSE)
+  save = FALSE, plot_historical = TRUE, plot.title = TRUE, chull = FALSE,
+  output.df = FALSE)
 
 {
   #browser()
@@ -101,6 +102,12 @@ gcmScatterPlot <- function(data = NULL, hist.period = NULL, proj.period = NULL,
   #Save output to file
   if(save == TRUE) {ggsave(gg_name, height = 6.5, width = 7)}
 
-  return(gg)
+  if(output.df == TRUE) {
+    out <- list(gg = gg, df = delta_clim)
+  } else {
+    out <- list(gg)
+  }
+
+  return(out)
 
 }
