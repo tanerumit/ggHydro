@@ -2,49 +2,27 @@
 % Please edit documentation in R/ggResponseSurface.R
 \name{ggResponseSurface}
 \alias{ggResponseSurface}
-\title{Climate response surface in ggplot}
+\title{Climate Response Surface}
 \usage{
-ggResponseSurface(data = NULL, tavg.col = "tavg", prcp.col = "prcp",
-  metric.col = NULL, tavg.breaks = NULL, prcp.breaks = NULL,
-  bin.pass.range = NULL, bin.fail.range = NULL, bin.threshold = NULL,
-  metric.dir = "increasing", display.center.value = TRUE)
+ggResponseSurface(data = NULL, x.specs = list(name = NULL, label =
+  NULL), y.specs = list(name = NULL, label = NULL), z.specs = list(name
+  = NULL, label = NULL, bins.up = NULL, bins.low = NULL, bins.mid = NULL,
+  dir = "+"), display.center.value = TRUE, plot.title = NULL,
+  verbose = FALSE, grid.color = NA, interpolate.grid = TRUE,
+  resolution = NULL, display.contours = TRUE,
+  contour.color = "gray90")
 }
 \arguments{
-\item{data}{data frame containing climate response surfaca data}
+\item{data}{data frame object with x, y, and z columns}
 
-\item{tavg.col}{name of the temperature changes column, Default: 'tavg'}
+\item{x.specs}{list of parameters specified for x dimension}
 
-\item{prcp.col}{name of the precipitation changes column, Default: 'prcp'}
+\item{y.specs}{list of parameters specified for y dimension}
 
-\item{metric.col}{name of the metric column, Default: NULL}
+\item{z.specs}{list of parameters specified for z dimension}
 
-\item{tavg.breaks}{temperature change axis breaks, Default: NULL}
-
-\item{prcp.breaks}{precipitation change axis breaks, Default: NULL}
-
-\item{bin.pass.range}{placeholder}
-
-\item{bin.fail.range}{placeholder}
-
-\item{bin.threshold}{placeholder}
-
-\item{metric.dir}{placeholder}
-
-\item{display.center.value}{placeholder}
-}
-\value{
-returns a ggplot2 object
+\item{verbose}{}
 }
 \description{
-FUNCTION_DESCRIPTION
-}
-\details{
-DETAILS
-}
-\examples{
-\dontrun{
-if(interactive()){
- #EXAMPLE1
- }
-}
+Climate Response Surface
 }

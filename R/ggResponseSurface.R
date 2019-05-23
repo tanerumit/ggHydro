@@ -28,7 +28,11 @@ ggResponseSurface <- function(
   resolution = NULL,
   display.contours = TRUE,
   contour.color = "gray90")
+
 {
+
+
+  #browser()
 
   #Libraries required
   require(ggplot2)
@@ -39,15 +43,6 @@ ggResponseSurface <- function(
   x_data <- data[[x.specs$name]]
   y_data <- data[[y.specs$name]]
   z_data <- data[[z.specs$name]]
-
-  if(is.null(contour.color)) contour.color <- "gray60"
-
-  if (!isTRUE(interpolate.grid)) {
-    df <- data_frame(x = x_data, y = y_data, z = z_data)
-  } else {
-    df <- gridInterpolate(x = x_data , y = y_data, z = z_data, resolution = resolution) %>%
-      rename(z = df2) %>% as_tibble()
-  }
 
   # Specify x, y breaks
   x_breaks <- unique(x_data)
@@ -60,6 +55,28 @@ ggResponseSurface <- function(
   # Specify x,y limits
   x_lim <- range(x_data) + x_interval * c(-1,1)
   y_lim <- range(y_data) + y_interval * c(-1,1)
+
+
+
+
+
+
+
+
+
+
+
+
+  if(is.null(contour.color)) contour.color <- "gray60"
+
+  if (!isTRUE(interpolate.grid)) {
+    df <- tibble(x = x_data, y = y_data, z = z_data)
+  } else {
+    df <- gridInterpolate(x = x_data , y = y_data, z = z_data, resolution = resolution) %>%
+      rename(z = df2) %>% as_tibble()
+  }
+
+
 
   # Number of bins in the lower and upper ranges
   z_bin_up_num  <- length(z.specs$bins.up)  - 1
@@ -90,7 +107,7 @@ ggResponseSurface <- function(
     }
   } else {NULL}
   z_bin_color_mid <- if (!is.null(z.specs$bins.mid)) "white" else NULL
-  z_bin_color <- c(z_bin_color_low, z_bin_color_mid, z_bin_color_up)
+  z_bin_color     <- c(z_bin_color_low, z_bin_color_mid, z_bin_color_up)
 
   # Define bins
   z_bins <- c(z.specs$bins.low, z.specs$bins.mid, z.specs$bins.up) %>% unique()
